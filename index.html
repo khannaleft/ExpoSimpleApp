@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple React Native Expo App Guide</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet" />
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+    h2 { color: #333; }
+    pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Simple React Native Expo App Guide</h1>
+
+  <h2>Step 1: Set Up Your Development Environment</h2>
+  <p>Install Node.js and Expo CLI:</p>
+  <pre><code class="language-bash">npm install -g expo-cli</code></pre>
+
+  <h2>Step 2: Create a New Expo Project</h2>
+  <p>Initialize your project:</p>
+  <pre><code class="language-bash">expo init SimpleApp
+cd SimpleApp</code></pre>
+  <p>Choose the "blank" template when prompted.</p>
+
+  <h2>Step 3: Install Dependencies</h2>
+  <pre><code class="language-bash">npm install @react-navigation/native @react-navigation/stack
+expo install react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context @react-native-community/masked-view</code></pre>
+
+  <h2>Step 4: Set Up Navigation</h2>
+  <p>Create a <code>navigation</code> folder and add <code>AppNavigator.js</code>:</p>
+  <pre><code class="language-javascript">/* navigation/AppNavigator.js */
+
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from '../screens/HomeScreen';
+import DetailScreen from '../screens/DetailScreen';
+
+const Stack = createStackNavigator();
+
+const AppNavigator = () => (
+  <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailScreen} />
+    </Stack.Navigator>
+  </NavigationContainer>
+);
+
+export default AppNavigator;</code></pre>
+
+  <h2>Step 5: Create Screens</h2>
+  <p>Create a <code>screens</code> folder and add <code>HomeScreen.js</code>:</p>
+  <pre><code class="language-javascript">/* screens/HomeScreen.js */
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+
+const HomeScreen = ({ navigation }) => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/posts')
+      .then(response => response.json())
+      .then(json => setData(json))
+      .catch(error => console.error(error));
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={data}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => navigation.navigate('Details', { item })}>
+            <View style={styles.item}>
+              <Text style={styles.title}>{item.title}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 10,
+  },
+  item: {
+    padding: 20,
+    marginVertical: 8,
+    backgroundColor: '#f9c2ff',
+  },
+  title: {
+    fontSize: 16,
+  },
+});
+
+export default HomeScreen;</code></pre>
+
+  <p>And <code>DetailScreen.js</code>:</p>
+  <pre><code class="language-javascript">/* screens/DetailScreen.js */
+
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const DetailScreen = ({ route }) => {
+  const { item } = route.params;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.body}>{item.body}</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  body: {
+    fontSize: 16,
+  },
+});
+
+export default DetailScreen;</code></pre>
+
+  <h2>Step 6: Update <code>App.js</code></h2>
+  <p>Replace the content of <code>App.js</code> with:</p>
+  <pre><code class="language-javascript">/* App.js */
+
+import React from 'react';
+import AppNavigator from './navigation/AppNavigator';
+
+export default function App() {
+  return <AppNavigator />;
+}</code></pre>
+
+  <h2>Step 7: Run the App</h2>
+  <pre><code class="language-bash">expo start</code></pre>
+  <p>Scan the QR code with the Expo Go app on your mobile device to see the app in action.</p>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-bash.min.js"></script>
+</body>
+</html>
